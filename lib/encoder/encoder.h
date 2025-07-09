@@ -2,7 +2,7 @@
 #define ENCODER_H
 
 #include <Arduino.h>
-#include "config.h" // For CLK, DT pins
+#include "config.h"
 
 extern volatile int rotation;
 

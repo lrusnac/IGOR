@@ -2,7 +2,7 @@
 #define BUTTON_H
 
 #include <Arduino.h>
-#include "config.h" // For buttonDebounceDelay
+#include "config.h"
 
 extern volatile bool buttonPressedFlag;
 extern unsigned long lastButtonPress;

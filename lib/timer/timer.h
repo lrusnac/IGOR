@@ -2,7 +2,7 @@
 #define TIMER_H
 
 #include <Arduino.h>
-#include "config.h" // For inactivityLimit, displayOffTimeLimit
+#include "config.h"
 
 extern unsigned long lastActivityTime;
 extern unsigned long countingStartTime;
