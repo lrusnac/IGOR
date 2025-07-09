@@ -21,9 +21,10 @@ const unsigned long inactivityLimit = 3 * 60000;  // 3 minutes in milliseconds
 enum State { MENU, COUNTING_UP, COUNTING_DOWN, SELECTING_DOWN_DURATION, IDLE };
 State currentState = MENU;
 
-int countdownValue = 20;  // Default value for countdown
-int initialCountdownValue = 20;  // Store the countdown value when selected
-unsigned long previousMillis = 0;  // For counting logic
+int countdownValue = 20;  // Default value for countdown in minutes
+int initialCountdownValue = 20;  // Store the countdown value when selected in minutes
+int countdownSeconds = 0; // For smooth progress bar
+unsigned long countingStartTime = 0;  // For tracking the start time of counting modes
 int elapsedMinutes = 0;
 bool isCounting = false;
 
@@ -162,6 +163,12 @@ void updateDisplay() {
   display.setTextSize(4);  // Larger size for main row
   display.setCursor(mainRowX, 30);  // Centered on main row
   display.print(mainRowText);
+
+  // Progress bar for countdown
+  if (currentState == COUNTING_DOWN) {
+    int progress = (int)(((float)countdownSeconds / (initialCountdownValue * 60)) * 128);
+    display.fillRect(0, 62, progress, 2, WHITE);
+  }
   
   display.display();  // Show the updated display
 }
@@ -215,6 +222,7 @@ void startCountingUp() {
   currentState = COUNTING_UP;
   elapsedMinutes = 0;
   isCounting = true;
+  countingStartTime = millis(); // Initialize countingStartTime
   lastActivityTime = millis();  // Reset inactivity timer
   Serial.println("Counting UP started.");
 }
@@ -224,6 +232,8 @@ void startCountingUp() {
 void startSelectingDownDuration() {
   currentState = SELECTING_DOWN_DURATION;
   countdownValue = 20;
+  countdownSeconds = countdownValue * 60; // Initialize countdownSeconds
+  isCounting = true; // Start counting for display updates
   lastActivityTime = millis();  // Reset inactivity timer
   Serial.println("Selecting DOWN duration.");
 }
@@ -232,8 +242,10 @@ void startSelectingDownDuration() {
 // Confirm countdown selection and start counting down
 void confirmCountdownSelection() {
   initialCountdownValue = countdownValue;
+  countdownSeconds = initialCountdownValue * 60; // Initialize countdownSeconds
   currentState = COUNTING_DOWN;
   isCounting = true;
+  countingStartTime = millis(); // Initialize countingStartTime
   lastActivityTime = millis();  // Reset inactivity timer
   Serial.print("Counting DOWN started with "); Serial.print(countdownValue); Serial.println(" minutes.");
 }
@@ -269,25 +281,35 @@ void resetFlowMinutes() {
 //=========================================================
 // Handle counting up or down logic
 void handleCounting(unsigned long currentMillis) {
-  if (!isCounting || (currentMillis - previousMillis < 60000)) return;
+  if (!isCounting) return;
 
-  previousMillis = currentMillis;
-  
+  unsigned long elapsedTime = currentMillis - countingStartTime;
+
   if (currentState == COUNTING_UP) {
-    elapsedMinutes++;
-    updateDisplay();
-    Serial.print("Counting UP: "); Serial.println(elapsedMinutes);
-  } else if (currentState == COUNTING_DOWN) {
-    countdownValue--;
-    if (countdownValue <= 0) {
-      flowMinutes += initialCountdownValue;
-      successAnimation();
-      currentState = MENU;
-      isCounting = false;
-      Serial.println("Countdown finished, returning to MENU.");
+    if (elapsedTime >= (elapsedMinutes + 1) * 60000) {
+      Serial.print("COUNTING_UP: currentMillis="); Serial.print(currentMillis);
+      Serial.print(", countingStartTime="); Serial.print(countingStartTime);
+      Serial.print(", diff="); Serial.println(elapsedTime);
+      elapsedMinutes++;
+      updateDisplay();
     }
-    updateDisplay();
-    Serial.print("Counting DOWN: "); Serial.println(countdownValue);
+  } else if (currentState == COUNTING_DOWN) {
+    if (elapsedTime >= (initialCountdownValue * 60 - countdownSeconds + 1) * 1000) {
+      Serial.print("COUNTING_DOWN: currentMillis="); Serial.print(currentMillis);
+      Serial.print(", countingStartTime="); Serial.print(countingStartTime);
+      Serial.print(", diff="); Serial.println(elapsedTime);
+      countdownSeconds--;
+      if (countdownSeconds % 60 == 0) {
+        countdownValue--;
+      }
+      if (countdownValue <= 0 && countdownSeconds <= 0) {
+        flowMinutes += initialCountdownValue; // Add total minutes to flowMinutes
+        successAnimation();
+        currentState = MENU;
+        isCounting = false;
+      }
+      updateDisplay();
+    }
   }
 }
 
@@ -324,6 +346,7 @@ void successAnimation() {
 void handleRotaryInput() {
   if (rotation / 4 != 0) {
     int rotation_value = rotation / 4;
+    rotation = rotation % 4;
 
     if (currentState == IDLE) {
       currentState = MENU;
@@ -337,7 +360,6 @@ void handleRotaryInput() {
       countdownValue = max(1, countdownValue + rotation_value);
     }
     
-    rotation = 0;
     updateDisplay();
   }
 }
