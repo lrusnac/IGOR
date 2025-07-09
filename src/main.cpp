@@ -30,6 +30,7 @@ bool isCounting = false;
 // Rotary encoder state
 volatile int rotation = 0;
 volatile bool buttonPressedFlag = false;
+volatile bool activity_in_isr = false;
 static int8_t last_state = 0;
 
 // Debounce timers
@@ -74,6 +75,11 @@ void setup() {
 //=========================================================
 void loop() {
   unsigned long currentMillis = millis();
+
+  if (activity_in_isr) {
+    lastActivityTime = currentMillis;
+    activity_in_isr = false;
+  }
   
   // Handle rotary encoder input
   handleRotaryInput();
@@ -317,8 +323,6 @@ void successAnimation() {
 // Handle rotary input for menu and countdown selection
 void handleRotaryInput() {
   if (rotation / 4 != 0) {
-    lastActivityTime = millis();
-
     int rotation_value = rotation / 4;
 
     if (currentState == IDLE) {
@@ -367,12 +371,14 @@ void ICACHE_RAM_ATTR handleEncoder() {
     rotation += transition;
   }
   last_state = state;
+  activity_in_isr = true;
 }
 
 void ICACHE_RAM_ATTR handleButton() {
   if (millis() - lastButtonPress > buttonDebounceDelay) {
     buttonPressedFlag = true;
     lastButtonPress = millis();
+    activity_in_isr = true;
   }
 }
 
