@@ -5,17 +5,24 @@
 #include "config.h"
 
 extern AppState currentState;
-extern int flowMinutes;
 extern MenuOption menuIndex;
+extern int flowMinutes;
+extern bool displayOff;
 extern String menuOptions[3];
 
-void initializeStateMachine();
+extern unsigned long lastActivityTime;
+extern unsigned long countingStartTime;
+extern unsigned long idleStartTime;
+
+extern bool isCounting;
+extern int elapsedMinutes;
+extern int countdownValue;
+extern int initialCountdownValue;
+extern int countdownSeconds;
+
+void handleInactivity();
+void handleCounting();
 void handleButtonPressStateMachine();
 void handleRotaryInputStateMachine();
-void startCountingUp();
-void startSelectingDownDuration();
-void confirmCountdownSelection();
-
-void resetFlowMinutes();
 
 #endif // STATE_MACHINE_H

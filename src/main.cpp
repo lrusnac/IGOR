@@ -6,7 +6,6 @@
 #include "display.h"
 #include "button.h"
 #include "encoder.h"
-#include "timer.h"
 #include "state_machine.h"
 
 void setup() {
@@ -27,15 +26,13 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-
   handleRotaryInputStateMachine();
 
   handleButtonPressStateMachine();
 
-  handleCounting(currentMillis);
+  handleCounting();
 
-  handleInactivity(currentMillis);
+  handleInactivity();
 
   display_update(flowMinutes, elapsedMinutes, countdownValue, countdownSeconds, initialCountdownValue, menuIndex, currentState, displayOff, menuOptions);
 
