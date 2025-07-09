@@ -38,7 +38,10 @@ void handleCounting(unsigned long currentMillis) {
         countdownValue--;
       }
       if (countdownValue <= 0 && countdownSeconds <= 0) {
-        stopCountingDown();
+        flowMinutes += initialCountdownValue;
+        display_success_animation();
+        currentState = AppState::MENU;
+        menuIndex = MENU_DOWN;
         isCounting = false;
       }
     }

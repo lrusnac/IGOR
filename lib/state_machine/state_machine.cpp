@@ -34,16 +34,19 @@ void handleButtonPressStateMachine() {
         break;
 
       case AppState::COUNTING_UP:
-        stopCountingUp();
+        currentState = AppState::MENU;
+        menuIndex = MENU_UP;
+        isCounting = false;
         break;
 
       case AppState::COUNTING_DOWN:
-        stopCountingDown();
+        currentState = AppState::MENU;
+        menuIndex = MENU_DOWN;
+        isCounting = false;
         break;
 
       case AppState::IDLE:
         currentState = AppState::MENU;
-        lastActivityTime = millis();
         if (displayOff) {
           display_on();
           displayOff = false;
@@ -68,6 +71,8 @@ void handleRotaryInputStateMachine() {
       menuIndex = (MenuOption)((menuIndex + rotation_value + 3) % 3);
     } else if (currentState == AppState::SELECTING_DOWN_DURATION) {
       countdownValue = max(1, countdownValue + rotation_value);
+    } else if (currentState == AppState::COUNTING_UP || currentState == AppState::COUNTING_DOWN) {
+      currentState = AppState::MENU;
     }
   }
 }
@@ -95,22 +100,6 @@ void confirmCountdownSelection() {
   isCounting = true;
   countingStartTime = millis();
   updateActivity(millis());
-}
-
-void stopCountingUp() {
-  flowMinutes += elapsedMinutes;
-  display_success_animation();
-  updateActivity(millis());
-  currentState = AppState::MENU;
-  isCounting = false;
-}
-
-void stopCountingDown() {
-  flowMinutes += (initialCountdownValue - countdownValue);
-  display_success_animation();
-  updateActivity(millis());
-  currentState = AppState::MENU;
-  isCounting = false;
 }
 
 void resetFlowMinutes() {

@@ -15,8 +15,7 @@ void handleRotaryInputStateMachine();
 void startCountingUp();
 void startSelectingDownDuration();
 void confirmCountdownSelection();
-void stopCountingUp();
-void stopCountingDown();
+
 void resetFlowMinutes();
 
 #endif // STATE_MACHINE_H
