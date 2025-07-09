@@ -12,5 +12,5 @@ void IRAM_ATTR handleEncoder() {
   static int8_t enc_states[] = {0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0};
   old_state = (old_state << 2) | ((digitalRead(DT) << 1) | digitalRead(CLK));
   rotation += enc_states[(old_state & 0x0f)];
-  updateActivity();
+  updateActivity(millis());
 }

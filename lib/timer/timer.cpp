@@ -3,10 +3,8 @@
 #include "display.h"
 #include "state_machine.h"
 
-
-
-void updateActivity() {
-  lastActivityTime = millis();
+void updateActivity(unsigned long currentMillis) {
+  lastActivityTime = currentMillis;
 }
 
 void handleInactivity(unsigned long currentMillis) {

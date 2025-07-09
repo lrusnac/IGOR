@@ -10,6 +10,6 @@ void IRAM_ATTR handleButton() {
   if (millis() - lastButtonPress > buttonDebounceDelay) {
     buttonPressedFlag = true;
     lastButtonPress = millis();
-    updateActivity();
+    updateActivity(millis());
   }
 }

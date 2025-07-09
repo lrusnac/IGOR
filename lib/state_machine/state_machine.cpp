@@ -16,7 +16,7 @@ void initializeStateMachine() {
 void handleButtonPressStateMachine() {
   if (buttonPressedFlag) {
     buttonPressedFlag = false;
-    updateActivity();
+    updateActivity(millis());
 
     switch (currentState) {
       case AppState::MENU:
@@ -77,8 +77,7 @@ void startCountingUp() {
   elapsedMinutes = 0;
   isCounting = true;
   countingStartTime = millis();
-  updateActivity();
-  Serial.println("Counting UP started.");
+  updateActivity(millis());
 }
 
 void startSelectingDownDuration() {
@@ -86,8 +85,7 @@ void startSelectingDownDuration() {
   countdownValue = 20;
   countdownSeconds = countdownValue * 60;
   isCounting = true;
-  updateActivity();
-  Serial.println("Selecting DOWN duration.");
+  updateActivity(millis());
 }
 
 void confirmCountdownSelection() {
@@ -96,29 +94,25 @@ void confirmCountdownSelection() {
   currentState = AppState::COUNTING_DOWN;
   isCounting = true;
   countingStartTime = millis();
-  updateActivity();
-  Serial.print("Counting DOWN started with "); Serial.print(countdownValue); Serial.println(" minutes.");
+  updateActivity(millis());
 }
 
 void stopCountingUp() {
   flowMinutes += elapsedMinutes;
   display_success_animation();
-  updateActivity();
+  updateActivity(millis());
   currentState = AppState::MENU;
   isCounting = false;
-  Serial.println("Counting UP stopped. Returning to MENU.");
 }
 
 void stopCountingDown() {
   flowMinutes += (initialCountdownValue - countdownValue);
   display_success_animation();
-  updateActivity();
+  updateActivity(millis());
   currentState = AppState::MENU;
   isCounting = false;
-  Serial.println("Counting DOWN stopped. Returning to MENU.");
 }
 
 void resetFlowMinutes() {
   flowMinutes = 0;
-  Serial.println("Flow minutes reset to 0.");
 }

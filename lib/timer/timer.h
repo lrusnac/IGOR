@@ -15,7 +15,7 @@ extern int initialCountdownValue;
 extern int countdownSeconds;
 extern bool displayOff;
 
-void updateActivity();
+void updateActivity(unsigned long currentMillis);
 void handleInactivity(unsigned long currentMillis);
 void handleCounting(unsigned long currentMillis);
 
