@@ -16,7 +16,7 @@ void initializeStateMachine() {
 void handleButtonPressStateMachine() {
   if (buttonPressedFlag) {
     buttonPressedFlag = false;
-    lastActivityTime = millis();
+    updateActivity();
 
     switch (currentState) {
       case AppState::MENU:
@@ -77,7 +77,7 @@ void startCountingUp() {
   elapsedMinutes = 0;
   isCounting = true;
   countingStartTime = millis();
-  lastActivityTime = millis();
+  updateActivity();
   Serial.println("Counting UP started.");
 }
 
@@ -86,7 +86,7 @@ void startSelectingDownDuration() {
   countdownValue = 20;
   countdownSeconds = countdownValue * 60;
   isCounting = true;
-  lastActivityTime = millis();
+  updateActivity();
   Serial.println("Selecting DOWN duration.");
 }
 
@@ -96,15 +96,15 @@ void confirmCountdownSelection() {
   currentState = AppState::COUNTING_DOWN;
   isCounting = true;
   countingStartTime = millis();
-  lastActivityTime = millis();
+  updateActivity();
   Serial.print("Counting DOWN started with "); Serial.print(countdownValue); Serial.println(" minutes.");
 }
 
 void stopCountingUp() {
   flowMinutes += elapsedMinutes;
   display_success_animation();
+  updateActivity();
   currentState = AppState::MENU;
-  lastActivityTime = millis();
   isCounting = false;
   Serial.println("Counting UP stopped. Returning to MENU.");
 }
@@ -112,8 +112,8 @@ void stopCountingUp() {
 void stopCountingDown() {
   flowMinutes += (initialCountdownValue - countdownValue);
   display_success_animation();
+  updateActivity();
   currentState = AppState::MENU;
-  lastActivityTime = millis();
   isCounting = false;
   Serial.println("Counting DOWN stopped. Returning to MENU.");
 }

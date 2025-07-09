@@ -29,11 +29,6 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
 
-  if (activity_in_isr) {
-    lastActivityTime = currentMillis;
-    activity_in_isr = false;
-  }
-
   handleRotaryInputStateMachine();
 
   handleButtonPressStateMachine();
@@ -44,7 +39,7 @@ void loop() {
 
   display_update(flowMinutes, elapsedMinutes, countdownValue, countdownSeconds, initialCountdownValue, menuIndex, currentState, displayOff, menuOptions);
 
-  if (displayOff && (currentState != AppState::IDLE || activity_in_isr)) {
+  if (displayOff && (currentState != AppState::IDLE)) {
     display_on();
     displayOff = false;
   }
