@@ -12,10 +12,10 @@ String menuOptions[3] = {"UP", "DOWN", "Reset"};
 void handleButtonPressStateMachine() {
   if (buttonPressedFlag) {
     buttonPressedFlag = false;
-    lastActivityTime = millis();
 
     switch (currentState) {
       case AppState::MENU:
+        lastActivityTime = millis();
         if (menuIndex == MENU_UP) {
           currentState = AppState::COUNTING_UP;
           elapsedMinutes = 0;
@@ -32,6 +32,7 @@ void handleButtonPressStateMachine() {
         break;
 
       case AppState::SELECTING_DOWN_DURATION:
+        lastActivityTime = millis();
         initialCountdownValue = countdownValue;
         countdownSeconds = initialCountdownValue * 60;
         currentState = AppState::COUNTING_DOWN;
@@ -40,12 +41,16 @@ void handleButtonPressStateMachine() {
         break;
 
       case AppState::COUNTING_UP:
+        lastActivityTime = millis();
+        flowMinutes += elapsedMinutes;
+        display_success_animation();
         currentState = AppState::MENU;
         menuIndex = MENU_UP;
         isCounting = false;
         break;
 
       case AppState::COUNTING_DOWN:
+        lastActivityTime = millis();
         currentState = AppState::MENU;
         menuIndex = MENU_DOWN;
         isCounting = false;
@@ -73,12 +78,13 @@ void handleRotaryInputStateMachine() {
         display_on();
         displayOff = false;
       }
-    } else if (currentState == AppState::MENU) {
-      menuIndex = (MenuOption)((menuIndex + rotation_value + 3) % 3);
-    } else if (currentState == AppState::SELECTING_DOWN_DURATION) {
-      countdownValue = max(1, countdownValue + rotation_value);
-    } else if (currentState == AppState::COUNTING_UP || currentState == AppState::COUNTING_DOWN) {
-      currentState = AppState::MENU;
+    } else { // Update activity only if not IDLE
+      lastActivityTime = millis();
+      if (currentState == AppState::MENU) {
+        menuIndex = (MenuOption)((menuIndex + rotation_value + 3) % 3);
+      } else if (currentState == AppState::SELECTING_DOWN_DURATION) {
+        countdownValue = max(1, countdownValue + rotation_value);
+      }
     }
   }
 }
@@ -91,6 +97,7 @@ void handleInactivity() {
   }
 
   if (currentState == AppState::IDLE && !displayOff && (millis() - idleStartTime > displayOffTimeLimit)) {
+    display_off();
     displayOff = true;
   }
 }
@@ -113,11 +120,11 @@ void handleCounting() {
       }
       if (countdownValue <= 0 && countdownSeconds <= 0) {
         flowMinutes += initialCountdownValue;
+        display_success_animation();
         lastActivityTime = millis();
         currentState = AppState::MENU;
         menuIndex = MENU_DOWN;
         isCounting = false;
-        display_success_animation();
       }
     }
   }
