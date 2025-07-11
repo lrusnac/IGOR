@@ -58,6 +58,7 @@ void handleButtonPressStateMachine() {
 
       case AppState::IDLE:
         currentState = AppState::MENU;
+        lastActivityTime = millis();
         if (displayOff) {
           display_on();
           displayOff = false;

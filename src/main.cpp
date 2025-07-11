@@ -20,6 +20,11 @@ void setup() {
 
   display_init();
 
+  lastActivityTime = millis(); // Initialize lastActivityTime at startup
+
+  // Initialize encoder old_state based on current pin readings
+  old_state = (digitalRead(DT) << 1) | digitalRead(CLK);
+
   display_update(flowMinutes, elapsedMinutes, countdownValue, countdownSeconds, initialCountdownValue, menuIndex, currentState, displayOff, menuOptions);
 
   Serial.println("Setup complete, starting loop...");

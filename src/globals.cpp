@@ -1,8 +1,8 @@
 #include "config.h"
 
-const unsigned long inactivityLimit = 3 * 60000;
+const unsigned long inactivityLimit = 3 * 60000; // 3 minutes
 const unsigned long buttonDebounceDelay = 500;
-const unsigned long displayOffTimeLimit = 30 * 60000;
+const unsigned long displayOffTimeLimit = 27 * 60000; // 27 minutes
 
 // Global variables for timer and state management
 unsigned long lastActivityTime = 0;
